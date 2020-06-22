@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .box{
+            width: 140px;
+            height: 180px;
+            border:2px solid #ccc;
+            position: relative;
+            text-align: center;
+            line-height: 260px;
+            font-size: 14px;
+            color: #adaaaa;
+            margin: 0 auto;
+        }
+        .box::after{
+            content: '';
+            width: 40px; 
+            border: 1px solid #ccc;
+            position: absolute;
+            top:50%;
+            left: 50%;
+            margin-left: -20px;
+        }
+        .box::before{
+            content: '';
+            height:40px; 
+            border: 1px solid #ccc;
+            position: absolute;
+            top:50%;
+            left: 50%;
+            margin-top: -20px;
+        }
+        .box .file{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 140px;
+            height:180px;
+            border: none;
+            outline: none;
+            font-size: 0px;
+            background: transparent;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .box-img{
+            margin-top: 60px;
+            width: 600px;
+            height: 220px;
+            border: 1px solid pink;
+
+        }
+        .box-img img{
+            float: left;
+            display: block;
+            width: 140px;
+            height: 180px;
+            margin-right: 10px;
+        }
+       
+        .box-img .text{
+            width: 100px;
+            height: 24px;
+            line-height: 24px;
+            font-weight: bold;
+            margin: 10px auto;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- <input type="file"> -->
+    <div class="warp">
+        <div class="box">
+            <span>上传图片</span> 
+            <input type="file" class="file">
+        </div>
+        <div class="box-img">
+            <div class="text">上传图片浏览</div>
+            <!-- <img src="./images/1.jpg" alt=""> -->
+        </div>
+    </div>
+    <script>
+        function query(selete){
+            return document.querySelector(selete);
+        }
+        var file =query('.file');
+
+        // 判断是否为图片可以直接使用 <input type="file" name="pic" accept="image/*">
+        // accept="image/*"可以过滤不是图片的类型
+       
+       
+        file.onchange=function(){
+            let fileTypes = ['.jpg','.png','.gif','.jpeg','.ico','.webp'];
+            // var reg=/(.*)\.(jpg|bmp|gif|ico|pcx|jpeg|tif|png|raw|tga)$/;
+            // let fileType = reg.test(filePath);
+            let filePath = this.value;  
+            //文件路径
+            console.log('文件路径===>',filePath);
+
+            //文件大小最大为1M
+           let fileMaxSize = 1024;
+
+            if(filePath){
+
+                let isHas = false;
+                //选择文件类型
+                let fileType = filePath.slice(filePath.indexOf('.'));
+                console.log('文件类型===>',fileType);
+
+                //选择文件的大小；
+                let fileSize = file.files[0].size;
+                console.log('文件的大小===>',fileSize);
+                let size = fileSize / 1024;
+
+                for(let i=0 ; i < fileTypes.length ; i++){
+                    if( fileTypes[i] == fileType){
+                        isHas = true;
+                        break ;
+
+                    }
+                }
+                if(!isHas){
+                    alert('文件类型不支持');
+                    file.value = '';
+                    return false;
+
+                }
+                //验证图片大小
+                if(size > fileMaxSize){
+                    alert('文件大小不能超过1M！');
+                    file.value = '';
+                    return false;
+
+                }
+
+                //验证图片的尺寸
+                 // 文件信息
+                let filePic = file.files[0];  
+                console.log('文件信息===>',filePic);
+
+                let reader = new FileReader();
+
+                reader.onload = function(e){
+                    let data =e.target.result;
+                    // console.log(data);
+                    //加载图片获取图片真实宽度和高度
+                    let image = new Image();
+                    image.onload = function(){
+                        let width = image.width;
+                        let height = image.height;
+                        if(width == 390 | height == 280){
+                            alert('图片尺寸符合');
+
+                            //创建图片标签
+                            let boxImg =query(".box-img");
+                            let  img =document.createElement("img");
+                            boxImg.appendChild(img);    
+
+                            img.src =data;
+
+                        } else{
+                            alert('图片尺寸应为：390*280！');
+                            file.value = '';
+                            return false;
+                        }
+                    }
+
+                    image.src = data;
+                    
+                }
+                reader.readAsDataURL(filePic);
+
+            
+
+
+
+            }else{
+                return false ;
+            }
+            
+        }
+
+
+    </script>
+</body>
+</html>
